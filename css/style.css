@@ -1,0 +1,366 @@
+/* --- GOOGLE FONTS --- */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Lora:ital,wght@0,400;0,700;1,400&display=swap');
+
+/* --- VARIABILI DI STILE --- */
+:root {
+    --primary-color: #8a4baf;
+    --primary-color-dark: #520a83;
+    --secondary-color: #fde2f3;
+    --background-color: #f9f7fb;
+    --text-color: #333;
+    --text-color-light: #666;
+    --card-bg-color: #ffffff;
+    --shadow-color: rgba(138, 75, 175, 0.1);
+    --border-color: #e8e1ee;
+    --success-bg: #f6fbf7;
+    --success-border: #c8e6c9;
+    --font-headings: 'Montserrat', sans-serif;
+    --font-body: 'Lora', serif;
+}
+
+/* --- STILI GENERALI --- */
+body { font-family: var(--font-body); margin: 0; background-color: var(--background-color); color: var(--text-color); line-height: 1.7; }
+h1, h2, h3, h4, label, button, select { font-family: var(--font-headings); }
+main { max-width: 1200px; margin: 2rem auto; padding: 0 1rem; }
+/* NUOVO BLOCCO */
+/* NUOVO BLOCCO */
+header {
+    background-color: #8a4baf; /* Colore di sfondo esatto come richiesto */
+    color: white;
+    padding: 2rem 1.5rem;
+    border-bottom-left-radius: 30px;
+    border-bottom-right-radius: 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1.5rem; /* Aumentato un po' lo spazio */
+}
+.header-content {
+    text-align: center;
+}
+.header-logo-titolo {
+    max-width: 750px; /* Imposta una larghezza massima per il logo-titolo */
+    width: 80%; /* Si adatta a schermi più piccoli */
+    height: auto; /* L'altezza si adatterà in proporzione */
+}
+.sottotitolo {
+    margin: 0.5rem 0 0 0;
+    font-family: var(--font-body);
+    font-style: italic;
+    opacity: 0.9;
+    font-size: 1.1rem;
+}
+section { background-color: var(--card-bg-color); padding: 2.5rem; border-radius: 12px; box-shadow: 0 8px 25px var(--shadow-color); border: 1px solid var(--border-color); }
+.hidden { display: none !important; }
+
+/* --- NAVIGAZIONE A SCHEDE --- */
+.schede-nav { display: flex; justify-content: center; margin-bottom: 2rem; background-color: transparent; border-bottom: none; }
+.tab-button { padding: 0.8rem 1.5rem; cursor: pointer; background-color: #fff; border: 1px solid var(--border-color); border-bottom: none; font-size: 1rem; font-weight: 600; color: var(--primary-color); transition: all 0.2s ease-in-out; margin: 0 -1px 0 0; }
+.tab-button:first-child { border-top-left-radius: 8px; }
+.tab-button:last-child { border-top-right-radius: 8px; }
+.tab-button:hover { background-color: var(--secondary-color); }
+.tab-button.active { background-color: var(--card-bg-color); position: relative; top: 1px; color: var(--primary-color-dark); }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* --- CARD CATALOGO --- */
+.grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 2rem; }
+.card { border: 1px solid var(--border-color); border-radius: 12px; box-shadow: 0 4px 8px var(--shadow-color); overflow: hidden; transition: transform 0.3s, box-shadow 0.3s; cursor: pointer; }
+.card:hover { transform: translateY(-8px); box-shadow: 0 12px 28px var(--shadow-color); }
+.card img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; display: block; }
+.card-content { padding: 1rem 1.5rem; }
+.card h3 { margin-bottom: 0.5rem; font-size: 1.2rem; }
+.card .materiali { font-family: var(--font-body); font-style: italic; color: var(--text-color-light); }
+
+
+/* --- STILI MODULI E FILTRI --- */
+.form-group { margin-bottom: 1.5rem; }
+.form-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--primary-color); }
+.form-group input, .form-group select, .filtro-item, .suggerimenti-filtro select { 
+    width: 100%; 
+    padding: 0.8rem; 
+    font-size: 1.05rem; 
+    font-family: var(--font-body); 
+    border: 1px solid var(--border-color); 
+    border-radius: 8px; 
+    box-sizing: border-box; 
+    -webkit-appearance: none; 
+    -moz-appearance: none; 
+    appearance: none; 
+    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23cccccc%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E'); 
+    background-repeat: no-repeat; 
+    background-position: right .9em top 50%; 
+    background-size: .65em auto;
+    background-color: #fff;
+    transition: border-color 0.2s;
+}
+.form-group input:focus, .form-group select:focus, .filtro-item:focus, .suggerimenti-filtro select:focus {
+    border-color: var(--primary-color);
+    outline: none;
+    box-shadow: 0 0 5px var(--secondary-color);
+}
+.form-hr { border: none; border-top: 1px solid var(--border-color); margin: 2rem 0; }
+.calcolo-btn { display: block; width: 100%; padding: 0.8rem 1.5rem; margin-top: 1.5rem; font-size: 1.1rem; font-weight: bold; color: white; background: linear-gradient(45deg, var(--primary-color), #c86dd7); border: none; border-radius: 8px; cursor: pointer; transition: transform 0.2s; }
+.calcolo-btn:hover { transform: scale(1.02); }
+
+/* --- Scelta Filato e Tensione --- */
+.choice-container { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+@media (min-width: 600px) { .choice-container { grid-template-columns: 1fr 1fr; } }
+.choice-block { padding: 1rem; border: 2px solid var(--border-color); border-radius: 8px; transition: all 0.2s ease-in-out; }
+.choice-block.active { border-color: var(--primary-color); background-color: #fdfafd; box-shadow: 0 0 10px var(--secondary-color); }
+.choice-block label { display: flex; align-items: center; cursor: pointer; font-weight: 700; }
+.choice-block input[type="radio"] { -webkit-appearance: none; -moz-appearance: none; appearance: none; width: 1.2em; height: 1.2em; border: 2px solid #ccc; border-radius: 50%; margin-right: 0.75rem; transition: all 0.15s; position: relative; background-color: #fff; }
+.choice-block input[type="radio"]:checked { background-color: var(--primary-color); border-color: var(--primary-color); }
+.choice-content { margin-top: 1rem; }
+input[type="range"] { -webkit-appearance: none; width: 100%; background: transparent; }
+input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; height: 20px; width: 20px; border-radius: 50%; background: var(--primary-color); cursor: pointer; margin-top: -8px; }
+input[type="range"]::-moz-range-thumb { height: 20px; width: 20px; border-radius: 50%; background: var(--primary-color); cursor: pointer; }
+input[type="range"]::-webkit-slider-runnable-track { width: 100%; height: 4px; cursor: pointer; background: var(--secondary-color); border-radius: 5px; }
+input[type="range"]::-moz-range-track { width: 100%; height: 4px; cursor: pointer; background: var(--secondary-color); border-radius: 5px; }
+.tensione-labels { display: flex; justify-content: space-between; font-size: 0.9rem; padding: 0 5px; }
+
+/* --- Risultati e Suggerimenti --- */
+.risultato-box { margin-top: 2rem; padding: 0; background-color: var(--card-bg-color); border: 1px solid var(--border-color); border-radius: 12px; font-size: 1.1rem; overflow: hidden; box-shadow: 0 8px 25px var(--shadow-color); }
+.risultato-box h4 { background-color: var(--success-bg); color: var(--primary-color-dark); margin: 0; padding: 1rem 1.5rem; border-bottom: 1px solid var(--border-color); }
+.risultato-sezione { padding: 1.5rem; text-align: center; }
+.risultato-valore { font-size: 1.8rem; font-weight: 700; color: var(--primary-color); }
+.risultato-info { font-size: 0.9rem; color: var(--text-color-light); }
+.risultato-finale { margin-top: 1rem; font-weight: 600; }
+.suggerimenti-container { padding: 1.5rem; text-align: left; background-color: var(--background-color); }
+.suggerimenti-container h4 { margin-top: 0; text-align: center; }
+.suggerimenti-filtro { display: flex; gap: 1rem; align-items: center; justify-content: center; margin-bottom: 1rem; }
+/* NUOVO BLOCCO */
+/* NUOVO BLOCCO */
+/* Applica lo stile a entrambe le liste di suggerimenti */
+.suggerimenti-lista ul, .risultato-box ul {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: 0 1.5rem; /* Spazio tra le colonne */
+}
+
+/* Su schermi grandi, usiamo due colonne per entrambe */
+@media (min-width: 768px) {
+    .suggerimenti-lista ul, .risultato-box ul {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+.suggerimenti-lista li, .risultato-box ul li {
+    display: flex;
+    justify-content: space-between; /* Spinge gli elementi ai lati opposti */
+    align-items: center;
+    padding: 0.75rem 0.5rem; /* Aggiunto un po' di padding laterale */
+    border-bottom: 1px solid var(--border-color);
+}
+.suggerimenti-lista li:last-child { border-bottom: none; }
+.suggerimenti-lista .efficienza, .risultato-box .efficienza {
+    font-weight: bold;
+    color: #555;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    padding-left: 1.5rem; /* Aumentato lo spazio */
+}
+.suggerimenti-lista a, .risultato-box ul a {
+    text-decoration: none;
+    color: var(--primary-color);
+    font-weight: 600;
+    font-family: var(--font-headings);
+}
+.suggerimenti-lista a:hover, .risultato-box ul a:hover {
+    text-decoration: underline;
+    color: var(--primary-color-dark);
+}
+
+/* --- Filtri Catalogo --- */
+.filtri-container { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; }
+.filtro-item { flex: 1; min-width: 200px; }
+
+/* --- Finestra Modale Tutorial --- */
+.modale-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+.modale-content { background-color: var(--card-bg-color); padding: 2rem; border-radius: 12px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); width: 90%; max-width: 800px; max-height: 90vh; overflow-y: auto; position: relative; }
+.modale-close-btn { position: absolute; top: 10px; right: 15px; font-size: 2rem; color: #aaa; background: none; border: none; cursor: pointer; }
+
+/* Layout del popup: video sopra, dettagli sotto */
+.modale-video { margin-bottom: 1.5rem; }
+.modale-video iframe { width: 100%; aspect-ratio: 16 / 9; border-radius: 8px; }
+.modale-dettagli h3 { margin-top: 0; }
+
+/* Navigazione a schede interna al popup */
+.modale-schede-nav { display: flex; border-bottom: 1px solid var(--border-color); margin-bottom: 1.5rem; }
+.modale-tab-button { padding: 0.75rem 1rem; cursor: pointer; background-color: transparent; border: none; border-bottom: 3px solid transparent; font-size: 1rem; font-weight: 600; color: var(--text-color-light); }
+.modale-tab-button.active { color: var(--primary-color); border-bottom-color: var(--primary-color); }
+.modale-tool-content { display: none; }
+.modale-tool-content.active { display: block; }
+.tool-wrapper { padding: 1rem 0; }
+.tool-btn { display: block; width: 100%; padding: 0.8rem 1.5rem; font-size: 1rem; font-weight: bold; color: white; background: linear-gradient(45deg, var(--primary-color), #c86dd7); border: none; border-radius: 8px; cursor: pointer; transition: transform 0.2s; }
+.tool-btn:hover { transform: scale(1.02); }
+.info-tool { font-style: italic; color: var(--text-color-light); text-align: center; }
+.tool-content-area { margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color); }
+
+/* --- NUOVO: Loading Spinner --- */
+.spinner-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid var(--secondary-color);
+    border-top-color: var(--primary-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+/* NUOVO BLOCCO DA AGGIUNGERE */
+.modale-azioni-tool {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem; /* Aggiunge spazio tra i pulsanti */
+    margin-top: 1rem;
+}
+/* NUOVO BLOCCO DA AGGIUNGERE */
+/* --- Stili per il Wizard del Calcolo Prezzo --- */
+.prezzo-step {
+    display: none; /* Nasconde tutti i passaggi di default */
+}
+
+.prezzo-step.active {
+    display: block; /* Mostra solo il passaggio attivo */
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+.radio-button-group-vertical {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.radio-button-group-vertical label {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+.radio-button-group-vertical label:hover {
+    border-color: var(--primary-color);
+    background-color: var(--background-color);
+}
+
+.radio-button-group-vertical input[type="radio"]:checked + .radio-content {
+    font-weight: bold;
+}
+
+.radio-button-group-vertical input[type="radio"] {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    width: 1.2em;
+    height: 1.2em;
+    border: 2px solid #ccc;
+    border-radius: 50%;
+    margin-right: 1rem;
+    transition: all 0.15s;
+    position: relative;
+    background-color: #fff;
+    flex-shrink: 0;
+}
+.radio-button-group-vertical input[type="radio"]:checked {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.radio-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.radio-content strong {
+    font-family: var(--font-headings);
+    color: var(--text-color);
+}
+
+.radio-description {
+    font-size: 0.9rem;
+    color: var(--text-color-light);
+    margin: 0;
+    padding: 0;
+    font-style: italic;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+/* NUOVO BLOCCO DA INCOLLARE */
+.header-logo {
+    height: 50px; /* Imposta un'altezza fissa per il logo */
+    width: auto; /* La larghezza si adatterà in proporzione */
+    margin-bottom: 0.5rem;
+}
+
+.header-content h1 {
+    margin: 0;
+    font-size: 2.5rem;
+    letter-spacing: 1px; /* Aumenta leggermente lo spazio tra le lettere */
+    text-transform: uppercase; /* Rende il titolo più "importante" */
+}
+/* --- Stili Guida nell'Header --- */
+.header-content {
+    text-align: center;
+    flex-grow: 1; /* Occupa lo spazio centrale */
+}
+.header-content h1 {
+    margin: 0;
+}
+.sottotitolo {
+    margin: 0.5rem 0 0 0;
+    font-family: var(--font-body);
+    font-style: italic;
+    opacity: 0.9;
+    font-size: 1.1rem;
+}
+.guida-container {
+    display: flex;
+    gap: 1rem; /* Spazio tra i pulsanti guida */
+}
+.guida-btn {
+    display: inline-block;
+    padding: 0.6rem 1.2rem;
+    border: 2px solid rgba(255, 255, 255, 0.7);
+    border-radius: 20px;
+    color: white;
+    text-decoration: none;
+    font-family: var(--font-headings);
+    font-weight: 600;
+    transition: all 0.2s ease-in-out;
+    background-color: transparent;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+.guida-btn:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-color: white;
+}
+/* --- CORREZIONE COLORE SFONDO --- */
+body {
+    background-color: #f4f4f9; /* Imposta lo sfondo generale su grigio chiaro */
+}
+
+.tab-content {
+    background-color: #ffffff; /* Assicura che l'area di lavoro principale sia bianca */
+}

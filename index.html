@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M4P - Il Catalogo Magico di Tessiland</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+ <header>
+    <div class="header-content">
+        <img src="assets/images/log_tessiland_2000x1000.jpg" alt="Logo Tessiland STUDIO" class="header-logo-titolo">
+        <p class="sottotitolo">Trova il tutorial perfetto, il filato giusto e calcola tutto ciò che ti serve.</p>
+    </div>
+    <div class="guida-container">
+        <button id="refresh-btn" class="guida-btn" style="background-color: var(--success-color); color: white;">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16" style="vertical-align: middle; margin-right: 5px;"><path d="M17.65,6.35C16.2,4.9 14.21,4 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20C15.73,20 18.84,17.45 19.73,14H17.65C16.83,16.33 14.61,18 12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6C13.66,6 15.14,6.69 16.22,7.78L13,11H20V4L17.65,6.35Z"></path></svg>
+            Aggiorna Catalogo
+        </button>
+        <button id="guida-testuale-btn" class="guida-btn">Guida Testuale</button>
+        <button id="video-guida-btn" class="guida-btn">Guida Video</button>
+    </div>
+</header>
+
+    <nav class="schede-nav">
+        <button class="tab-button active" data-scheda="catalogo">Catalogo Progetti</button>
+        <button class="tab-button" data-scheda="tool-consumo">Calcolo Consumo Filato</button>
+        <button class="tab-button" data-scheda="tool-prezzo">Calcolo Prezzo Creazione</button>
+    </nav>
+
+    <main>
+
+    <div id="catalogo" class="tab-content active">
+        <section id="filtri-sezione">
+            <h2>Cerca e Filtra</h2>
+            <div class="filtri-container">
+                <input type="search" id="search-input" class="filtro-item" placeholder="Cerca per nome, autrice, materiali...">
+                <select id="filtro-autrice" class="filtro-item">
+                    <option value="tutte">Filtra per Autrice</option>
+                </select>
+                <select id="filtro-filato" class="filtro-item">
+                    <option value="tutti">Filtra per Filato</option>
+                </select>
+            </div>
+        </section>
+        <section id="catalogo-sezione">
+            <div id="catalogo-container" class="grid-container">
+                </div>
+        </section>
+    </div>
+
+    <div id="tool-consumo" class="tab-content">
+        <section class="tool-sezione">
+            <h2>Tool: Quanto Filo Mi Occorre?</h2>
+            <div id="tool-consumo-filato-container">
+
+                <div class="form-group">
+                    <label for="tipo-progetto">1. Scegli il Tipo di Progetto</label>
+                    <select id="tipo-progetto">
+                        <option value="maglia">Maglia</option>
+                        <option value="coperta">Coperta</option>
+                        <option value="sciarpa">Sciarpa / Scialle</option>
+                        <option value="cappello">Cappello / Scaldacollo</option>
+                        <option value="personalizzato">Altro Progetto (Personalizzato)</option>
+                    </select>
+                </div>
+
+                <div id="campi-misure-standard"></div>
+
+                <div id="campi-misure-personalizzate" class="hidden">
+                    <div class="form-group">
+                        <label for="tipo-progetto-personalizzato">Specifica il tipo di progetto</label>
+                        <select id="tipo-progetto-personalizzato">
+                            <option value="">-- Seleziona --</option>
+                            <option value="borsa">Borsa</option>
+                            <option value="scialle-triangolare">Scialle (Triangolare)</option>
+                            <option value="bijoux">Bijoux</option>
+                        </select>
+                    </div>
+                    <div id="campi-misure-personalizzate-dinamici"></div>
+                </div>
+
+                <hr class="form-hr">
+
+                <div class="form-group">
+                    <label>2. Scegli il Filato</label>
+                    <div class="choice-container">
+                       <div id="block-catalogo" class="choice-block active">
+                            <input type="radio" id="scelta-catalogo" name="scelta-filato" value="catalogo" checked>
+                            <label for="scelta-catalogo">Dal Catalogo Tessiland</label>
+                            <div id="container-filato-catalogo" class="choice-content">
+                                <select id="filato-selezionato">
+                                    <option>Caricamento filati...</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div id="block-standard" class="choice-block">
+                            <input type="radio" id="scelta-standard" name="scelta-filato" value="standard">
+                            <label for="scelta-standard">Usa Standard Internazionale</label>
+                            <div id="container-filato-standard" class="choice-content hidden">
+                                <select id="standard-selezionato">
+                                    <option value="">-- Scegli uno standard --</option>
+                                    <option value="25-230">Lace/Pizzo (25gr - 230mt)</option>
+                                    <option value="50-175">Fingering/Sottile (50gr - 175mt)</option>
+                                    <option value="50-150">Sport/Baby (50gr - 150mt)</option>
+                                    <option value="50-120">DK/Leggero (50gr - 120mt)</option>
+                                    <option value="50-100">Medium/Medio (50gr - 100mt)</option>
+                                    <option value="50-75">Bulky/Grosso (50gr - 75mt)</option>
+                                    <option value="50-50">Superbulky/Extra Grosso (50gr - 50mt)</option>
+                                </select>
+                                <div class="form-group" style="margin-top: 1rem;">
+                                    <label for="gomitolo-peso-manuale">Peso del tuo gomitolo (g)</label>
+                                    <input type="number" id="gomitolo-peso-manuale" placeholder="Es: 50">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="tipo-lavorazione">3. Scegli il Tipo di Lavorazione</label>
+                    <select id="tipo-lavorazione">
+                        <option value="uncinetto">Uncinetto</option>
+                        <option value="ferri">Ferri</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="tipo-punto">4. Scegli il Punto Principale</label>
+                    <select id="tipo-punto">
+                        <option>Scegli prima la lavorazione...</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="tensione-slider">5. Indica la tua Tensione</label>
+                    <input type="range" id="tensione-slider" min="-1" max="1" value="0" step="1">
+                    <div class="tensione-labels">
+                        <span>Mano Morbida</span>
+                        <span>Normale</span>
+                        <span>Mano Stretta</span>
+                    </div>
+                </div>
+
+                <hr class="form-hr">
+
+                <div class="form-group-check">
+                    <input type="checkbox" id="ho-campione-check">
+                    <label for="ho-campione-check">Ho i dati di un campione 10x10cm (per un calcolo ancora più preciso)</label>
+                </div>
+
+                <div id="dati-campione" class="hidden">
+                    <h4>Dati del tuo campione</h4>
+                    <div class="form-group">
+                        <label for="campione-peso">Peso Campione 10x10cm (grammi)</label>
+                        <input type="number" id="campione-peso" placeholder="Es: 5">
+                    </div>
+                </div>
+
+                <button id="calcola-consumo-btn" class="calcolo-btn">Calcola Consumo</button>
+
+                <div id="risultato-consumo" class="risultato-box">
+                </div>
+
+            </div>
+        </section>
+    </div>
+
+    <div id="tool-prezzo" class="tab-content">
+    <section class="tool-sezione">
+        <h2>Tool: A Quanto Vendo la Creazione?</h2>
+        
+        <div id="tool-prezzo-vendita-container">
+            <!-- Step 1: Costo Materiali -->
+            <div id="prezzo-step-1" class="prezzo-step active">
+                <h3>Passo 1: Costo dei Materiali</h3>
+                <div class="form-group">
+                    <label for="costo-materiali">Quanto hai speso per i materiali? (€)</label>
+                    <input type="number" id="costo-materiali" placeholder="Es: 25" step="0.01">
+                </div>
+                <button class="calcolo-btn" data-next-step="2">Avanti →</button>
+            </div>
+
+            <!-- Step 2: Difficoltà -->
+            <div id="prezzo-step-2" class="prezzo-step">
+                <h3>Passo 2: Difficoltà del Progetto</h3>
+                <div class="radio-button-group-vertical">
+                    <label>
+                        <input type="radio" name="difficolta" value="facile" checked>
+                        <div class="radio-content">
+                            <strong>Facile</strong>
+                            <p class="radio-description">Punti base ripetitivi, nessun cambio colore, schema lineare senza aumenti o diminuzioni complesse</p>
+                        </div>
+                    </label>
+                    <label>
+                        <input type="radio" name="difficolta" value="bassa">
+                        <div class="radio-content">
+                            <strong>Bassa Difficoltà</strong>
+                            <p class="radio-description">Qualche variazione di punto, cambi colore semplici, aumenti/diminuzioni regolari, forme base</p>
+                        </div>
+                    </label>
+                    <label>
+                        <input type="radio" name="difficolta" value="alta">
+                        <div class="radio-content">
+                            <strong>Alta Difficoltà</strong>
+                            <p class="radio-description">Tecniche avanzate, punti complessi, colorwork elaborato, costruzione non standard, dettagli raffinati</p>
+                        </div>
+                    </label>
+                    <label>
+                        <input type="radio" name="difficolta" value="difficile">
+                        <div class="radio-content">
+                            <strong>Molto Difficile</strong>
+                            <p class="radio-description">Tecniche specialistiche, alta precisione richiesta, punti traforati complessi, intarsi, modellazione 3D, finiture professionali</p>
+                        </div>
+                    </label>
+                </div>
+                <button class="calcolo-btn" data-next-step="3">Avanti →</button>
+            </div>
+
+            <!-- Step 3: Dimensione -->
+            <div id="prezzo-step-3" class="prezzo-step">
+                <h3>Passo 3: Dimensione del Progetto</h3>
+                <div class="radio-button-group-vertical">
+                    <label>
+                        <input type="radio" name="dimensione" value="miniatura" checked>
+                        <div class="radio-content">
+                            <strong>Miniatura</strong>
+                            <p class="radio-description">Orecchini, anelli, spille, portachiavi, decorazioni piccole sotto i 10cm</p>
+                        </div>
+                    </label>
+                    <label>
+                        <input type="radio" name="dimensione" value="piccola">
+                        <div class="radio-content">
+                            <strong>Piccola</strong>
+                            <p class="radio-description">Cappelli, fascie, scaldacollo, guanti, calzini, pochette, borsellini fino a 30cm</p>
+                        </div>
+                    </label>
+                    <label>
+                        <input type="radio" name="dimensione" value="media">
+                        <div class="radio-content">
+                            <strong>Media</strong>
+                            <p class="radio-description">Scialli medi, borse a tracolla, top estivi, copertine neonato, cuscini decorativi 40-60cm</p>
+                        </div>
+                    </label>
+                    <label>
+                        <input type="radio" name="dimensione" value="grande">
+                        <div class="radio-content">
+                            <strong>Grande</strong>
+                            <p class="radio-description">Maglioni adulto, cardigan, coperte singole, scialli grandi, mantelle corte, progetti 80-120cm</p>
+                        </div>
+                    </label>
+                    <label>
+                        <input type="radio" name="dimensione" value="over">
+                        <div class="radio-content">
+                            <strong>Extra Grande</strong>
+                            <p class="radio-description">Coperte matrimoniali, cappotti lunghi, abiti interi, mantelle lunghe, progetti oltre 150cm</p>
+                        </div>
+                    </label>
+                </div>
+                <button class="calcolo-btn" data-next-step="4">Avanti →</button>
+            </div>
+
+            <!-- Step 4: Esperienza -->
+            <div id="prezzo-step-4" class="prezzo-step">
+                <h3>Passo 4: La Tua Esperienza</h3>
+                <div class="radio-button-group-vertical">
+                    <label>
+                        <input type="radio" name="esperienza" value="inesperta" checked>
+                        <div class="radio-content">
+                            <strong>Inesperta/Beginner</strong>
+                            <p class="radio-description">Meno di 1 anno di pratica, conosci i punti base, velocità di lavoro lenta, ancora in fase di apprendimento</p>
+                        </div>
+                    </label>
+                    <label>
+                        <input type="radio" name="esperienza" value="principiante">
+                        <div class="radio-content">
+                            <strong>Principiante Avanzata</strong>
+                            <p class="radio-description">1-2 anni di esperienza, padronanza punti base, sperimenti nuove tecniche, velocità media</p>
+                        </div>
+                    </label>
+                    <label>
+                        <input type="radio" name="esperienza" value="hobbista">
+                        <div class="radio-content">
+                            <strong>Hobbista Esperta</strong>
+                            <p class="radio-description">2-5 anni, ottima manualità, conosci tecniche avanzate, lavori con sicurezza e buona velocità</p>
+                        </div>
+                    </label>
+                    <label>
+                        <input type="radio" name="esperienza" value="esperta">
+                        <div class="radio-content">
+                            <strong>Esperta/Veterana</strong>
+                            <p class="radio-description">5-10 anni, padronanza completa delle tecniche, crei variazioni personali, finiture impeccabili</p>
+                        </div>
+                    </label>
+                    <label>
+                        <input type="radio" name="esperienza" value="professionista">
+                        <div class="radio-content">
+                            <strong>Professionista/Master</strong>
+                            <p class="radio-description">Oltre 10 anni, expertise riconosciuta, insegni tecniche, sviluppi pattern originali, qualità museale</p>
+                        </div>
+                    </label>
+                </div>
+                <button class="calcolo-btn" data-next-step="5">Avanti →</button>
+            </div>
+
+            <!-- Step 5: Marginalità -->
+            <div id="prezzo-step-5" class="prezzo-step">
+                <h3>Passo 5: Tipo di Vendita</h3>
+                <div class="radio-button-group-vertical">
+                    <label>
+                        <input type="radio" name="marginalita" value="amatoriale" checked>
+                        <div class="radio-content">
+                            <strong>Amatoriale/Regalo</strong>
+                            <p class="radio-description">Vendita tra amici, regali personalizzati, recupero spese, nessun guadagno pianificato (+20% margine)</p>
+                        </div>
+                    </label>
+                    <label>
+                        <input type="radio" name="marginalita" value="hobbista">
+                        <div class="radio-content">
+                            <strong>Hobbista/Mercatini</strong>
+                            <p class="radio-description">Vendita occasionale, mercatini locali, social media, piccolo guadagno extra (+40% margine)</p>
+                        </div>
+                    </label>
+                    <label>
+                        <input type="radio" name="marginalita" value="impegnata">
+                        <div class="radio-content">
+                            <strong>Semi-Professionale</strong>
+                            <p class="radio-description">Vendita regolare, shop online, fiere specializzate, secondo reddito stabile (+70% margine)</p>
+                        </div>
+                    </label>
+                    <label>
+                        <input type="radio" name="marginalita" value="professionista">
+                        <div class="radio-content">
+                            <strong>Business Professionale</strong>
+                            <p class="radio-description">Attività principale, partita IVA, brand riconosciuto, clientela fidelizzata, retail/wholesale (+100% margine)</p>
+                        </div>
+                    </label>
+                </div>
+                <button id="calcola-prezzo-finale-btn" class="calcolo-btn">Calcola Prezzo Finale</button>
+            </div>
+
+            <!-- Risultato -->
+            <div id="risultato-prezzo" class="risultato-box prezzo-step"></div>
+        </div>
+    </section>
+</main>
+
+    <div id="modale-tutorial-overlay" class="modale-overlay hidden">
+    <div class="modale-content">
+        <button id="modale-tutorial-close" class="modale-close-btn">&times;</button>
+        <div id="modale-tutorial-body">
+            </div>
+    </div>
+</div>
+<div id="modale-guida-overlay" class="modale-overlay hidden">
+    <div class="modale-content">
+        <button id="modale-guida-close" class="modale-close-btn">&times;</button>
+        <div id="modale-guida-body">
+            <h2>Guida Completa a Tessiland STUDIO</h2>
+
+            <h4>Sezione 1: Il Catalogo Progetti 🎨</h4>
+            <p>Questa è la tua vetrina sull'universo creativo di Tessiland. Qui puoi esplorare centinaia di tutorial video, usando la barra di ricerca o i menu a tendina per filtrare per Autrice e Filato.</p>
+            <p>Cliccando su un tutorial si aprirà il suo "Cruscotto di Progetto", dove potrai non solo vedere il video, ma anche accedere a due strumenti potentissimi: "Sostituisci il Filato" e "Adatta alla tua Taglia".</p>
+
+            <h4>Sezione 2: Tool Calcolo Consumo Filato 🧶</h4>
+            <p>Questo strumento ti guida passo passo nel calcolare con precisione il filato necessario per qualsiasi progetto, anche quelli personalizzati come borse, scialli e bijoux. Inserisci le misure, scegli il filato e la lavorazione, e indica la tua tensione personale (se hai una mano stretta o morbida) per una stima super-accurata.</p>
+
+            <h4>Sezione 3: Tool Calcolo Prezzo Creazione 💶</h4>
+            <p>Questo non è un semplice calcolatore, ma un sistema di valutazione. Ti guida attraverso 5 passaggi (Costo Materiali, Difficoltà, Dimensione, Esperienza e Marginalità) per aiutarti a dare il giusto valore di mercato alle tue creazioni, basandosi su una formula che pondera tutti questi aspetti.</p>
+        </div>
+    </div>
+</div>
+<div id="modale-video-guida-overlay" class="modale-overlay hidden">
+    <div class="modale-content">
+        <button id="modale-video-guida-close" class="modale-close-btn">&times;</button>
+        <div id="modale-video-guida-body" class="modale-video">
+            </div>
+    </div>
+</div>
+    <script src="js/app.js"></script>
+</body>
+</html>
