@@ -25,40 +25,27 @@ main { max-width: 1200px; margin: 2rem auto; padding: 0 1rem; }
 /* NUOVO BLOCCO */
 /* NUOVO BLOCCO */
 header {
-    background-color: #8a4baf; /* Colore di sfondo viola */
+    background-color: #8a4baf; /* Colore di sfondo esatto come richiesto */
     color: white;
-    padding: 1rem 0 1.5rem 0; /* Spazio sopra e sotto la fascia bianca */
+    padding: 2rem 1.5rem;
     border-bottom-left-radius: 30px;
     border-bottom-right-radius: 30px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    gap: 1rem;
+    gap: 1.5rem; /* Aumentato un po' lo spazio */
 }
-
-.logo-background-container {
-    background-color: white;
-    width: 100%;
-    padding: 1.5rem 0;
-    text-align: center;
-}
-
-.header-logo-titolo {
-    max-width: 450px;
-    width: 80%;
-    height: auto;
-    display: block; /* Necessario per centrare con margin auto */
-    margin: 0 auto; /* Centra l'immagine nel suo contenitore */
-}
-
 .header-content {
     text-align: center;
-    padding: 0 1rem; /* Aggiunge spazio laterale al sottotitolo */
 }
-
+.header-logo-titolo {
+    max-width: 750px; /* Imposta una larghezza massima per il logo-titolo */
+    width: 80%; /* Si adatta a schermi più piccoli */
+    height: auto; /* L'altezza si adatterà in proporzione */
+}
 .sottotitolo {
-    margin: 0;
+    margin: 0.5rem 0 0 0;
     font-family: var(--font-body);
     font-style: italic;
     opacity: 0.9;
