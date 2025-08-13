@@ -63,6 +63,8 @@ const modaleGuidaOverlay = document.getElementById('modale-guida-overlay');
 const modaleGuidaCloseBtn = document.getElementById('modale-guida-close');
 const modaleVideoGuidaOverlay = document.getElementById('modale-video-guida-overlay');
 const modaleVideoGuidaCloseBtn = document.getElementById('modale-video-guida-close');
+// NUOVA RIGA DA INCOLLARE
+const refreshAppBtn = document.getElementById('refresh-app-btn');
 // --- LOGICA PULSANTE AGGIORNA ---
     const refreshBtn = document.getElementById('refresh-btn');
     if (refreshBtn) {
@@ -821,6 +823,16 @@ if (modaleVideoGuidaCloseBtn) {
     modaleVideoGuidaCloseBtn.addEventListener('click', () => {
         document.getElementById('modale-video-guida-body').innerHTML = ''; // Ferma il video
         modaleVideoGuidaOverlay.classList.add('hidden');
+    });
+}
+// NUOVO BLOCCO DA INCOLLARE
+// ==========================================================
+// LOGICA PULSANTE REFRESH
+// ==========================================================
+if (refreshAppBtn) {
+    refreshAppBtn.addEventListener('click', () => {
+        // Il 'true' forza il ricaricamento dal server, ignorando la cache del browser.
+        location.reload(true); 
     });
 }
 });
