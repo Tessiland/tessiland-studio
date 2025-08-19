@@ -814,7 +814,7 @@ if (videoGuidaBtn) {
     videoGuidaBtn.addEventListener('click', () => {
         const videoBody = document.getElementById('modale-video-guida-body');
         // Incolla qui il tuo ID video di YouTube
-        const videoId = '9z-5qeVKEyQ'; // Esempio
+        const videoId = '9VOrN9S3C5Y'; // Video Guida
         videoBody.innerHTML = `<iframe width="100%" height="315" src="https://www.youtube.com/embed/${videoId}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
         modaleVideoGuidaOverlay.classList.remove('hidden');
     });
