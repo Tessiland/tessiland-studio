@@ -8,6 +8,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const URL_FATTORI = 'https://us-central1-mtt-management-tool.cloudfunctions.net/getFattoriPunto';
     const URL_CALCOLO = 'https://stimaconsumoavanzata-blvnz6q2ua-uc.a.run.app';
 
+    const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    const safeUrl = u => { try { const url = new URL(u, location.href); return ['http:','https:'].includes(url.protocol) ? url.href : '#'; } catch { return '#'; } };
+
     // ============================================================
     // STATO
     // ============================================================
@@ -236,20 +239,19 @@ document.addEventListener('DOMContentLoaded', () => {
             if (item.filatiCollegati && item.filatiCollegati.length > 0) {
                 const visibili = item.filatiCollegati.slice(0, 3);
                 const extra    = item.filatiCollegati.length - 3;
-                chipsHtml = visibili.map(f => `<span class="filato-chip">${f.nome}</span>`).join('');
+                chipsHtml = visibili.map(f => `<span class="filato-chip">${esc(f.nome)}</span>`).join('');
                 if (extra > 0) chipsHtml += `<span class="filato-chip">+${extra}</span>`;
             } else if (item.materiali) {
-                // materiali legacy: mostra ogni elemento come chip
                 chipsHtml = item.materiali.split(',').slice(0, 3)
-                    .map(m => `<span class="filato-chip">${m.trim()}</span>`).join('');
+                    .map(m => `<span class="filato-chip">${esc(m.trim())}</span>`).join('');
             }
 
             return `
-                <div class="card" data-id="${item.id}">
-                    <img src="${thumb}" alt="${item.titolo || ''}" loading="lazy">
+                <div class="card" data-id="${esc(item.id)}">
+                    <img src="${safeUrl(thumb)}" alt="${esc(item.titolo)}" loading="lazy">
                     <div class="card-content">
-                        <h3>${item.titolo || 'Titolo non disponibile'}</h3>
-                        <div class="card-autrice">${item.autrice || ''}</div>
+                        <h3>${esc(item.titolo || 'Titolo non disponibile')}</h3>
+                        <div class="card-autrice">${esc(item.autrice || '')}</div>
                         ${chipsHtml ? `<div class="card-chips"><span class="card-chips-label">Materiali</span>${chipsHtml}</div>` : ''}
                     </div>
                 </div>`;
@@ -1383,14 +1385,28 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    function aggiornaWizardProgress(stepAttivo) {
+        const dots = document.querySelectorAll('#wizard-progress .wizard-dot');
+        const lines = document.querySelectorAll('#wizard-progress .wizard-line');
+        const n = parseInt(stepAttivo);
+        dots.forEach((dot, i) => {
+            dot.classList.toggle('active', i + 1 === n);
+            dot.classList.toggle('done', i + 1 < n);
+        });
+        lines.forEach((line, i) => {
+            line.classList.toggle('done', i + 1 < n);
+        });
+    }
     function mostraStepPrezzo(n, steps) {
         steps.forEach(s => s.classList.remove('active'));
         document.getElementById(`prezzo-step-${n}`)?.classList.add('active');
+        aggiornaWizardProgress(n);
     }
     function resetWizardPrezzo(steps) {
         document.getElementById('costo-materiali').value = '';
         steps.forEach(s => s.classList.remove('active'));
         document.getElementById('prezzo-step-1').classList.add('active');
+        aggiornaWizardProgress(1);
     }
     function eseguiCalcoloPrezzo(steps) {
         const costo      = parseFloat(document.getElementById('costo-materiali').value) || 0;

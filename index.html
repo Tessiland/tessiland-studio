@@ -23,21 +23,21 @@
 
 <nav class="tool-nav">
     <button class="tool-nav-card active" data-scheda="catalogo">
-        <span class="tool-nav-icon">🎬</span>
+        <span class="tool-nav-icon"><svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="22" height="18" rx="3"/><polygon points="12,10 12,18 19,14" fill="currentColor" stroke="none"/></svg></span>
         <div class="tool-nav-body">
             <span class="tool-nav-title">Catalogo Tutorial</span>
             <span class="tool-nav-desc">Trova il progetto perfetto con i tuoi filati Tessiland</span>
         </div>
     </button>
     <button class="tool-nav-card" data-scheda="tool-consumo">
-        <span class="tool-nav-icon">🧶</span>
+        <span class="tool-nav-icon"><svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="14" cy="15" r="10"/><path d="M7 10c4 5 10 5 14 0" stroke-width="1.5"/><path d="M7 20c4-5 10-5 14 0" stroke-width="1.5"/><path d="M14 5c-2-2-5-1-5 1" stroke-width="1.5"/></svg></span>
         <div class="tool-nav-body">
             <span class="tool-nav-title">Calcolo Consumo</span>
             <span class="tool-nav-desc">Quanti grammi di filato ti servono per il tuo progetto?</span>
         </div>
     </button>
     <button class="tool-nav-card" data-scheda="tool-prezzo">
-        <span class="tool-nav-icon">💶</span>
+        <span class="tool-nav-icon"><svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14V7a2 2 0 012-2h7l11 11-9 9L4 14z"/><circle cx="10" cy="10" r="2" fill="currentColor" stroke="none"/></svg></span>
         <div class="tool-nav-body">
             <span class="tool-nav-title">Calcolo Prezzo</span>
             <span class="tool-nav-desc">Quanto vale davvero la tua creazione handmade?</span>
@@ -226,6 +226,18 @@
         <section class="tool-sezione">
             <h2>Tool: A Quanto Vendo la Creazione?</h2>
             <div id="tool-prezzo-vendita-container">
+
+                <div class="wizard-progress" id="wizard-progress">
+                    <span class="wizard-dot active" data-step="1"></span>
+                    <span class="wizard-line"></span>
+                    <span class="wizard-dot" data-step="2"></span>
+                    <span class="wizard-line"></span>
+                    <span class="wizard-dot" data-step="3"></span>
+                    <span class="wizard-line"></span>
+                    <span class="wizard-dot" data-step="4"></span>
+                    <span class="wizard-line"></span>
+                    <span class="wizard-dot" data-step="5"></span>
+                </div>
 
                 <!-- Step 1 -->
                 <div id="prezzo-step-1" class="prezzo-step active">
