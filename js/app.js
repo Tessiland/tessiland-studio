@@ -1,3 +1,8 @@
+// Service Worker — disabilitato per primo deploy, da attivare dopo verifica produzione
+// if ('serviceWorker' in navigator && location.protocol === 'https:') {
+//     navigator.serviceWorker.register('./sw.js').catch(() => {});
+// }
+
 document.addEventListener('DOMContentLoaded', () => {
 
     // ============================================================
@@ -7,6 +12,47 @@ document.addEventListener('DOMContentLoaded', () => {
     const URL_FILATI  = 'https://getfilati-blvnz6q2ua-uc.a.run.app';
     const URL_FATTORI = 'https://us-central1-mtt-management-tool.cloudfunctions.net/getFattoriPunto';
     const URL_CALCOLO = 'https://stimaconsumoavanzata-blvnz6q2ua-uc.a.run.app';
+
+    const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    const safeUrl = u => { try { const url = new URL(u, location.href); return ['http:','https:'].includes(url.protocol) ? url.href : '#'; } catch { return '#'; } };
+
+    // ============================================================
+    // PREFERITI (localStorage)
+    // ============================================================
+    function getPreferiti() {
+        try { return JSON.parse(localStorage.getItem('ts-preferiti') || '[]'); } catch { return []; }
+    }
+    function togglePreferito(id) {
+        const lista = getPreferiti();
+        const idx = lista.indexOf(id);
+        if (idx >= 0) lista.splice(idx, 1); else lista.push(id);
+        localStorage.setItem('ts-preferiti', JSON.stringify(lista));
+        aggiornaContatorPreferiti();
+        return idx < 0;
+    }
+    function isPreferito(id) { return getPreferiti().includes(id); }
+    function aggiornaContatorPreferiti() {
+        const n = getPreferiti().length;
+        const badge = document.getElementById('preferiti-count');
+        if (badge) {
+            badge.textContent = n;
+            badge.classList.toggle('hidden', n === 0);
+        }
+    }
+
+    // Banner iOS
+    function mostraBannerIOS() {
+        const isIos = /iPad|iPhone|iPod/.test(navigator.userAgent);
+        const isStandalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone;
+        const dismissed = localStorage.getItem('ts-ios-banner-dismissed');
+        if (isIos && !isStandalone && !dismissed) {
+            document.getElementById('ios-install-banner')?.classList.remove('hidden');
+        }
+    }
+    document.getElementById('ios-banner-close')?.addEventListener('click', () => {
+        document.getElementById('ios-install-banner')?.classList.add('hidden');
+        localStorage.setItem('ts-ios-banner-dismissed', '1');
+    });
 
     // ============================================================
     // STATO
@@ -34,8 +80,157 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const contenitoreCatalogo = document.getElementById('catalogo-container');
     const searchInput         = document.getElementById('search-input');
-    const filtroAutriceSelect = document.getElementById('filtro-autrice');
-    const filtroFilatoSelect  = document.getElementById('filtro-filato');
+    const dropdownAutrice     = document.getElementById('dropdown-autrice');
+    const dropdownFilato      = document.getElementById('dropdown-filato');
+
+    // ============================================================
+    // DROPDOWN CUSTOM — logica generica
+    // ============================================================
+    function initDropdown(container, onChange) {
+        const trigger = container.querySelector('.cd-trigger');
+        const label   = container.querySelector('.cd-trigger-label');
+        const clear   = container.querySelector('.cd-trigger-clear');
+        const panel   = container.querySelector('.cd-panel');
+        const search  = container.querySelector('.cd-search');
+        const options = container.querySelector('.cd-options');
+
+        function open() {
+            panel.classList.add('open');
+            trigger.classList.add('open');
+            search.value = '';
+            filterOptions('');
+            search.focus();
+        }
+        function close() {
+            panel.classList.remove('open');
+            trigger.classList.remove('open');
+        }
+        function setValue(value, text, silent) {
+            container.dataset.value = value;
+            label.textContent = text || container.dataset.placeholder;
+            label.classList.toggle('placeholder', !value);
+            trigger.classList.toggle('has-value', !!value);
+            close();
+            if (!silent) onChange(value);
+        }
+        function filterOptions(term) {
+            const t = term.toLowerCase();
+            options.querySelectorAll('.cd-option').forEach(btn => {
+                const match = btn.textContent.toLowerCase().includes(t);
+                btn.style.display = match ? '' : 'none';
+            });
+            const noEmpty = container.querySelector('.cd-empty');
+            const visibili = options.querySelectorAll('.cd-option:not([style*="display: none"])');
+            if (visibili.length === 0) {
+                if (!noEmpty) {
+                    const p = document.createElement('div');
+                    p.className = 'cd-empty';
+                    p.textContent = 'Nessun risultato';
+                    options.appendChild(p);
+                }
+            } else if (noEmpty) { noEmpty.remove(); }
+        }
+
+        trigger.addEventListener('click', e => {
+            if (e.target.closest('.cd-trigger-clear')) return;
+            panel.classList.contains('open') ? close() : open();
+        });
+        clear?.addEventListener('click', e => {
+            e.stopPropagation();
+            setValue('', '');
+        });
+        search.addEventListener('input', () => filterOptions(search.value));
+        options.addEventListener('click', e => {
+            const btn = e.target.closest('.cd-option');
+            if (!btn) return;
+            options.querySelectorAll('.cd-option').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            setValue(btn.dataset.value, btn.textContent);
+        });
+        document.addEventListener('click', e => {
+            if (!container.contains(e.target)) close();
+        });
+
+        container._dropdown = { setValue, close, setOptions(items) {
+            options.innerHTML = items.map(it =>
+                `<button type="button" class="cd-option" data-value="${esc(it.value)}" role="option">${esc(it.label)}</button>`
+            ).join('');
+        }};
+    }
+
+    initDropdown(dropdownAutrice, val => {
+        stato.filtriCatalogo.autrice = val || 'tutte';
+        renderAppCatalogo();
+    });
+    initDropdown(dropdownFilato, val => {
+        stato.filtriCatalogo.filatoId = val;
+        renderAppCatalogo();
+    });
+
+    // ============================================================
+    // WRAP SELECT → dropdown custom (per i select del tool consumo)
+    // ============================================================
+    function wrapSelect(selectEl) {
+        if (!selectEl || selectEl.style.display === 'none') return;
+        const wrapper = document.createElement('div');
+        wrapper.className = 'custom-dropdown';
+        const firstOpt = selectEl.options[0];
+        const hasEmpty = firstOpt && firstOpt.value === '';
+        const placeholder = hasEmpty ? firstOpt.text : 'Seleziona...';
+        wrapper.dataset.placeholder = placeholder;
+        wrapper.dataset.value = selectEl.value;
+        wrapper.innerHTML = `
+            <button type="button" class="cd-trigger${selectEl.value && hasEmpty ? ' has-value' : ''}" aria-haspopup="listbox">
+                <span class="cd-trigger-label ${selectEl.value ? '' : 'placeholder'}">${selectEl.value ? selectEl.options[selectEl.selectedIndex].text : placeholder}</span>
+                ${hasEmpty ? '<span class="cd-trigger-clear" aria-label="Reset">✕</span>' : ''}
+                <span class="cd-trigger-arrow"></span>
+            </button>
+            <div class="cd-panel" role="listbox">
+                <input type="text" class="cd-search" placeholder="Cerca...">
+                <div class="cd-options"></div>
+            </div>`;
+        selectEl.parentNode.insertBefore(wrapper, selectEl);
+        selectEl.style.display = 'none';
+
+        function syncFromSelect() {
+            const opts = wrapper.querySelector('.cd-options');
+            const items = [...selectEl.options]
+                .filter(o => o.value !== '')
+                .map(o => `<button type="button" class="cd-option${o.value === selectEl.value ? ' selected' : ''}" data-value="${esc(o.value)}" role="option">${esc(o.text)}</button>`)
+                .join('');
+            opts.innerHTML = items;
+            const label = wrapper.querySelector('.cd-trigger-label');
+            const trigger = wrapper.querySelector('.cd-trigger');
+            if (selectEl.value && selectEl.selectedIndex >= 0) {
+                label.textContent = selectEl.options[selectEl.selectedIndex].text;
+                label.classList.remove('placeholder');
+                trigger.classList.add('has-value');
+            } else {
+                label.textContent = placeholder;
+                label.classList.add('placeholder');
+                trigger.classList.remove('has-value');
+            }
+            wrapper.dataset.value = selectEl.value;
+        }
+
+        initDropdown(wrapper, val => {
+            selectEl.value = val;
+            selectEl.dispatchEvent(new Event('change'));
+        });
+        syncFromSelect();
+
+        const observer = new MutationObserver(() => syncFromSelect());
+        observer.observe(selectEl, { childList: true, subtree: true, attributes: true });
+        selectEl.addEventListener('change', () => syncFromSelect());
+
+        const origValueDesc = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'value');
+        Object.defineProperty(selectEl, 'value', {
+            get() { return origValueDesc.get.call(selectEl); },
+            set(v) { origValueDesc.set.call(selectEl, v); syncFromSelect(); }
+        });
+
+        return wrapper;
+    }
 
     // Tool Calcolo Filato
     const tipoProgettoSelect                 = document.getElementById('tipo-progetto');
@@ -56,6 +251,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const containerFilatoCatalogo = document.getElementById('container-filato-catalogo');
     const containerFilatoStandard = document.getElementById('container-filato-standard');
 
+    // Wrap select → dropdown custom (tool consumo)
+    wrapSelect(tipoProgettoSelect);
+    wrapSelect(tipoProgettoPersonalizzatoSelect);
+    wrapSelect(lavorazioneSelect);
+    wrapSelect(puntoSelect);
+    wrapSelect(document.getElementById('standard-selezionato'));
+
+    // Menu header ⋮
+    const headerMenuBtn = document.getElementById('header-menu-btn');
+    const headerMenuPanel = document.getElementById('header-menu-panel');
+    headerMenuBtn?.addEventListener('click', () => headerMenuPanel.classList.toggle('open'));
+    document.addEventListener('click', e => {
+        if (!headerMenuBtn?.contains(e.target) && !headerMenuPanel?.contains(e.target))
+            headerMenuPanel?.classList.remove('open');
+    });
+
     // Modali
     const modaleTutorialOverlay   = document.getElementById('modale-tutorial-overlay');
     const modaleTutorialBody      = document.getElementById('modale-tutorial-body');
@@ -74,15 +285,18 @@ document.addEventListener('DOMContentLoaded', () => {
     inizializzaPicker();
 
     // ============================================================
-    // SPINNER
+    // SKELETON LOADING (al posto dello spinner)
     // ============================================================
-    function mostraSpinner() {
-        const el = document.createElement('div');
-        el.className = 'spinner-overlay';
-        el.innerHTML = '<div class="spinner"></div>';
-        document.body.appendChild(el);
+    function mostraSkeleton() {
+        if (!contenitoreCatalogo) return;
+        const cards = Array.from({length: 6}, () =>
+            '<div class="skeleton skeleton-card"></div>'
+        ).join('');
+        contenitoreCatalogo.innerHTML = cards;
     }
-    function nascondiSpinner() { document.querySelector('.spinner-overlay')?.remove(); }
+    function nascondiSkeleton() {
+        contenitoreCatalogo?.querySelectorAll('.skeleton').forEach(el => el.remove());
+    }
 
     // ============================================================
     // NAVIGAZIONE SCHEDE
@@ -99,7 +313,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ============================================================
     // CARICAMENTO DATI
     // ============================================================
-    mostraSpinner();
+    mostraSkeleton();
 
     Promise.all([
         fetch(`${URL_CACHE_TUTORIALS}?v=${Date.now()}`).then(r => {
@@ -116,6 +330,7 @@ document.addEventListener('DOMContentLoaded', () => {
         stato.dati.fattoriPunto   = fattori;
 
         popolaFiltriCatalogo();
+        applicaDeepLink();
         renderAppCatalogo();
         aggiornaSelezioneFilato();   // filati filtrati per tipo progetto corrente
         aggiornaPuntiDisponibili();
@@ -125,48 +340,85 @@ document.addEventListener('DOMContentLoaded', () => {
         if (contenitoreCatalogo)
             contenitoreCatalogo.innerHTML = '<p style="text-align:center;color:red;">Caricamento dati fallito. Riprova più tardi.</p>';
     })
-    .finally(() => nascondiSpinner());
+    .finally(() => { nascondiSkeleton(); mostraBannerIOS(); aggiornaContatorPreferiti(); });
 
     // ============================================================
     // CATALOGO — filtri
     // ============================================================
     function popolaFiltriCatalogo() {
-        // Autrici
-        const autrici = [...new Set(
+        const topAutrici = ['Cristiana Rossi', 'La Fata Tuttofare', 'La Mamu', 'Tessiland', 'Egle Breme'];
+        const autriciSet = [...new Set(
             stato.dati.tuttiTutorials.map(t => (t.autrice || '').trim()).filter(Boolean)
-        )].sort();
-        filtroAutriceSelect.innerHTML = '<option value="tutte">Filtra per Autrice</option>';
-        autrici.forEach(a => filtroAutriceSelect.appendChild(new Option(a, a)));
+        )];
+        const top = topAutrici.filter(a => autriciSet.some(x => x.toLowerCase() === a.toLowerCase()));
+        const resto = autriciSet.filter(a => !top.some(t => t.toLowerCase() === a.toLowerCase())).sort();
+        const autrici = [...top, ...resto];
+        dropdownAutrice._dropdown.setOptions(autrici.map(a => ({ value: a, label: a })));
 
-        // Filati — da filatiCollegati strutturati (con fallback su nessuno)
         const filatiUsati = new Map();
         stato.dati.tuttiTutorials.forEach(t => {
             (t.filatiCollegati || []).forEach(f => {
                 if (f.id && f.nome) filatiUsati.set(f.id, f.nome);
             });
         });
-        filtroFilatoSelect.innerHTML = '<option value="">Filtra per Filato</option>';
-        [...filatiUsati.entries()]
-            .sort((a, b) => a[1].localeCompare(b[1]))
-            .forEach(([id, nome]) => filtroFilatoSelect.appendChild(new Option(nome, id)));
+        dropdownFilato._dropdown.setOptions(
+            [...filatiUsati.entries()]
+                .sort((a, b) => a[1].localeCompare(b[1]))
+                .map(([id, nome]) => ({ value: id, label: nome }))
+        );
+    }
+
+    // Deep link: ?filato=NomeFilato&autrice=NomeAutrice
+    function applicaDeepLink() {
+        const params = new URLSearchParams(window.location.search);
+
+        const filato = params.get('filato');
+        if (filato) {
+            const match = [...dropdownFilato.querySelectorAll('.cd-option')].find(
+                b => b.textContent.toLowerCase() === filato.toLowerCase()
+            );
+            if (match) {
+                dropdownFilato._dropdown.setValue(match.dataset.value, match.textContent, true);
+                stato.filtriCatalogo.filatoId = match.dataset.value;
+            }
+        }
+
+        const autrice = params.get('autrice');
+        if (autrice) {
+            const match = [...dropdownAutrice.querySelectorAll('.cd-option')].find(
+                b => b.textContent.toLowerCase() === autrice.toLowerCase()
+            );
+            if (match) {
+                dropdownAutrice._dropdown.setValue(match.dataset.value, match.textContent, true);
+                stato.filtriCatalogo.autrice = match.dataset.value;
+            }
+        }
     }
 
     searchInput.addEventListener('input', e => {
         stato.filtriCatalogo.termineRicerca = e.target.value.toLowerCase();
         renderAppCatalogo();
     });
-    filtroAutriceSelect.addEventListener('change', e => {
-        stato.filtriCatalogo.autrice = e.target.value;
-        renderAppCatalogo();
-    });
-    filtroFilatoSelect.addEventListener('change', e => {
-        stato.filtriCatalogo.filatoId = e.target.value;
-        renderAppCatalogo();
-    });
 
     contenitoreCatalogo.addEventListener('click', e => {
+        const favBtn = e.target.closest('.card-fav');
+        if (favBtn) {
+            e.stopPropagation();
+            const id = favBtn.dataset.id;
+            const now = togglePreferito(id);
+            favBtn.classList.toggle('is-fav', now);
+            return;
+        }
         const card = e.target.closest('.card');
         if (card) apriModaleTutorial(card.dataset.id);
+    });
+
+    // Filtro preferiti toggle
+    let soloPreferiti = false;
+    document.getElementById('filtro-preferiti')?.addEventListener('click', () => {
+        soloPreferiti = !soloPreferiti;
+        document.getElementById('filtro-preferiti').classList.toggle('active', soloPreferiti);
+        renderAppCatalogo();
     });
 
     function renderAppCatalogo() {
@@ -189,6 +441,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 (t.filatiCollegati || []).some(f => f.id === filatoId)
             );
         }
+        if (soloPreferiti) {
+            const pref = getPreferiti();
+            lista = lista.filter(t => pref.includes(t.id));
+        }
 
         renderCatalogo(lista);
     }
@@ -208,20 +464,23 @@ document.addEventListener('DOMContentLoaded', () => {
             if (item.filatiCollegati && item.filatiCollegati.length > 0) {
                 const visibili = item.filatiCollegati.slice(0, 3);
                 const extra    = item.filatiCollegati.length - 3;
-                chipsHtml = visibili.map(f => `<span class="filato-chip">${f.nome}</span>`).join('');
+                chipsHtml = visibili.map(f => `<span class="filato-chip">${esc(f.nome)}</span>`).join('');
                 if (extra > 0) chipsHtml += `<span class="filato-chip">+${extra}</span>`;
             } else if (item.materiali) {
-                // materiali legacy: mostra ogni elemento come chip
                 chipsHtml = item.materiali.split(',').slice(0, 3)
-                    .map(m => `<span class="filato-chip">${m.trim()}</span>`).join('');
+                    .map(m => `<span class="filato-chip">${esc(m.trim())}</span>`).join('');
             }
 
+            const fav = isPreferito(item.id);
             return `
-                <div class="card" data-id="${item.id}">
-                    <img src="${thumb}" alt="${item.titolo || ''}" loading="lazy">
+                <div class="card" data-id="${esc(item.id)}">
+                    <button class="card-fav ${fav ? 'is-fav' : ''}" data-id="${esc(item.id)}" aria-label="Preferito">
+                        <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 000-7.78z"/></svg>
+                    </button>
+                    <img src="${safeUrl(thumb)}" alt="${esc(item.titolo)}" loading="lazy">
                     <div class="card-content">
-                        <h3>${item.titolo || 'Titolo non disponibile'}</h3>
-                        <div class="card-autrice">${item.autrice || ''}</div>
+                        <h3>${esc(item.titolo || 'Titolo non disponibile')}</h3>
+                        <div class="card-autrice">${esc(item.autrice || '')}</div>
                         ${chipsHtml ? `<div class="card-chips"><span class="card-chips-label">Materiali</span>${chipsHtml}</div>` : ''}
                     </div>
                 </div>`;
@@ -311,7 +570,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                 </div>
                 <div class="modale-dettagli">
-                    <h3>${tutorial.titolo}</h3>
+                    <div class="modale-titolo-row">
+                        <h3>${tutorial.titolo}</h3>
+                        <button class="card-fav modale-fav ${isPreferito(tutorial.id) ? 'is-fav' : ''}" data-id="${esc(tutorial.id)}" aria-label="Preferito">
+                            <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 000-7.78z"/></svg>
+                        </button>
+                    </div>
                     <div class="modale-info-row">
                         <span class="modale-label">Autrice</span>
                         <span class="modale-value">${tutorial.autrice}</span>
@@ -343,6 +607,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (t.dataset.tool === 'sostituisci-filato') mostraToolSostituzione(tutorial, filatiRiferimento);
                 if (t.dataset.tool === 'adatta-taglia')     mostraToolAdattamento(tutorial, filatiRiferimento);
             });
+        });
+
+        // Cuore preferito nella modale
+        modaleTutorialBody.querySelector('.modale-fav')?.addEventListener('click', e => {
+            const btn = e.currentTarget;
+            const now = togglePreferito(btn.dataset.id);
+            btn.classList.toggle('is-fav', now);
         });
 
         // Zoom sulle miniature filato nella modale
@@ -1355,14 +1626,28 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    function aggiornaWizardProgress(stepAttivo) {
+        const dots = document.querySelectorAll('#wizard-progress .wizard-dot');
+        const lines = document.querySelectorAll('#wizard-progress .wizard-line');
+        const n = parseInt(stepAttivo);
+        dots.forEach((dot, i) => {
+            dot.classList.toggle('active', i + 1 === n);
+            dot.classList.toggle('done', i + 1 < n);
+        });
+        lines.forEach((line, i) => {
+            line.classList.toggle('done', i + 1 < n);
+        });
+    }
     function mostraStepPrezzo(n, steps) {
         steps.forEach(s => s.classList.remove('active'));
         document.getElementById(`prezzo-step-${n}`)?.classList.add('active');
+        aggiornaWizardProgress(n);
     }
     function resetWizardPrezzo(steps) {
         document.getElementById('costo-materiali').value = '';
         steps.forEach(s => s.classList.remove('active'));
         document.getElementById('prezzo-step-1').classList.add('active');
+        aggiornaWizardProgress(1);
     }
     function eseguiCalcoloPrezzo(steps) {
         const costo      = parseFloat(document.getElementById('costo-materiali').value) || 0;

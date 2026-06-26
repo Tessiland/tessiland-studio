@@ -1,0 +1,24 @@
+{
+  "name": "Tessiland Studio",
+  "short_name": "Studio",
+  "description": "Catalogo tutorial, calcolo filato e prezzi per le appassionate di uncinetto",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#F9F6F1",
+  "theme_color": "#7B4BAE",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "assets/images/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/images/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
