@@ -368,7 +368,7 @@ document.addEventListener('DOMContentLoaded', () => {
         );
     }
 
-    // Deep link: ?filato=NomeFilato&autrice=NomeAutrice
+    // Deep link: ?filato=NomeFilato&autrice=NomeAutrice&tutorial=<id>
     function applicaDeepLink() {
         const params = new URLSearchParams(window.location.search);
 
@@ -393,6 +393,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 stato.filtriCatalogo.autrice = match.dataset.value;
             }
         }
+
+        // Deep link a un tutorial specifico: apre direttamente la sua modale.
+        // apriModaleTutorial ignora un id inesistente (guard interno).
+        const tutorialId = params.get('tutorial');
+        if (tutorialId) apriModaleTutorial(tutorialId);
     }
 
     searchInput.addEventListener('input', e => {
