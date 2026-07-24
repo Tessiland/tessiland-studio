@@ -400,8 +400,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (tutorialId) apriModaleTutorial(tutorialId);
 
         // Deep link a uno strumento: ?tool=prezzo | ?tool=consumo apre la scheda.
+        // Allowlist: un valore arbitrario nell'URL non deve raggiungere querySelector.
         const tool = params.get('tool');
-        if (tool) {
+        if (tool && ['prezzo', 'consumo'].includes(tool)) {
             const btn = document.querySelector(`.tool-nav-card[data-scheda="tool-${tool}"]`);
             if (btn) btn.click();
         }
