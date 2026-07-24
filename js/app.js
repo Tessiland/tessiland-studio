@@ -398,6 +398,13 @@ document.addEventListener('DOMContentLoaded', () => {
         // apriModaleTutorial ignora un id inesistente (guard interno).
         const tutorialId = params.get('tutorial');
         if (tutorialId) apriModaleTutorial(tutorialId);
+
+        // Deep link a uno strumento: ?tool=prezzo | ?tool=consumo apre la scheda.
+        const tool = params.get('tool');
+        if (tool) {
+            const btn = document.querySelector(`.tool-nav-card[data-scheda="tool-${tool}"]`);
+            if (btn) btn.click();
+        }
     }
 
     searchInput.addEventListener('input', e => {
