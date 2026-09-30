@@ -561,6 +561,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Materiali del progetto (card con foto, max 4 + «altri») e attrezzi generici (riga «Utili») — dal 30/09/2026
         // fallback: il vecchio campo MTT prodottoEsterno {nome, link} diventa una card materiale
+        // link a una categoria (prodotto non più in vendita sostituito dalla sua categoria) → «Scegli sul sito» invece di «Vedi prodotto»
         const materiali = (tutorial.materialiCollegati && tutorial.materialiCollegati.length)
             ? tutorial.materialiCollegati
             : (tutorial.prodottoEsterno?.nome && tutorial.prodottoEsterno?.link ? [tutorial.prodottoEsterno] : []);
@@ -571,7 +572,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     : `<div class="mfc-img mfc-img--vuota">🧵</div>`}</div>
                 <div class="mfc-info">
                     <span class="mfc-nome">${esc(m.nome)}</span>
-                    ${m.link ? `<a class="mfc-link" href="${safeUrl(m.link)}" target="_blank" rel="noopener">Vedi prodotto ↗</a>` : ''}
+                    ${m.link ? `<a class="mfc-link" href="${safeUrl(m.link)}" target="_blank" rel="noopener">${/\.html(?:$|[?#])/.test(m.link) ? 'Vedi prodotto' : 'Scegli sul sito'} ↗</a>` : ''}
                 </div>
             </div>`;
         const MAX_MAT = 4;
