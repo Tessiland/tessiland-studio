@@ -1712,3 +1712,64 @@ a.risultato-link:hover {
     font-size: 1.1rem;
     vertical-align: middle;
 }
+
+/* ============================================================
+   DESCRIZIONE PROGETTO (ⓘ) + SET/KIT — 30/09/2026
+   ============================================================ */
+.card { position: relative; }
+.card-titolo-row { display: flex; align-items: flex-start; gap: 0.5rem; }
+.card-titolo-row h3 { flex: 1; }
+.card-info {
+    flex: 0 0 auto;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    border: 1.5px solid var(--primary);
+    background: var(--primary-bg);
+    color: var(--primary-dark);
+    font: italic 700 0.8rem/1 Georgia, serif;
+    cursor: pointer;
+    padding: 0;
+    margin-top: 1px;
+}
+.card.info-aperta .card-info { background: var(--primary); color: white; }
+.card-info-pop {
+    display: none;
+    position: absolute;
+    left: 0.6rem; right: 0.6rem; top: 0.6rem;
+    z-index: 3;
+    background: white;
+    border: 1px solid var(--primary);
+    border-radius: var(--radius-sm, 8px);
+    box-shadow: var(--shadow-lg);
+    padding: 0.7rem 0.85rem;
+    font-size: 0.85rem;
+    line-height: 1.45;
+    color: var(--text);
+    cursor: pointer;
+}
+.card.info-aperta .card-info-pop { display: block; }
+.modale-descrizione {
+    margin: 0 0 0.85rem;
+    padding: 0.65rem 0.8rem;
+    background: var(--primary-bg);
+    border-left: 3px solid var(--primary);
+    border-radius: 6px;
+    font-size: 0.88rem;
+    line-height: 1.5;
+    color: var(--text);
+}
+.btn-setkit {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    margin: 0.2rem 0 0.9rem;
+    padding: 0.7rem 0.9rem;
+    background: var(--primary);
+    color: white;
+    text-decoration: none;
+    border-radius: 10px;
+    transition: background 0.2s;
+}
+.btn-setkit:hover { background: var(--primary-dark); }
+.btn-setkit-top { font-weight: 700; font-size: 0.95rem; }
+.btn-setkit-nome { font-size: 0.8rem; opacity: 0.9; }

@@ -14,6 +14,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const URL_CALCOLO = 'https://stimaconsumoavanzata-blvnz6q2ua-uc.a.run.app';
 
     const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    // descrizione breve del progetto (MTT, dal 30/09/2026): righe separate da a-capo
+    const descrizioneHtml = d => String(d || '').split(/\n+/).map(r => esc(r.trim())).filter(Boolean).join('<br>');
     const safeUrl = u => { try { const url = new URL(u, location.href); return ['http:','https:'].includes(url.protocol) ? url.href : '#'; } catch { return '#'; } };
 
     // ============================================================
@@ -422,6 +424,15 @@ document.addEventListener('DOMContentLoaded', () => {
             favBtn.classList.toggle('is-fav', now);
             return;
         }
+        const infoBtn = e.target.closest('.card-info, .card-info-pop');
+        if (infoBtn) {
+            e.stopPropagation();
+            const c = infoBtn.closest('.card');
+            const aperta = c.classList.contains('info-aperta');
+            contenitoreCatalogo.querySelectorAll('.card.info-aperta').forEach(x => x.classList.remove('info-aperta'));
+            if (!aperta) c.classList.add('info-aperta');
+            return;
+        }
         const card = e.target.closest('.card');
         if (card) apriModaleTutorial(card.dataset.id);
     });
@@ -491,8 +502,12 @@ document.addEventListener('DOMContentLoaded', () => {
                         <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 000-7.78z"/></svg>
                     </button>
                     <img src="${safeUrl(thumb)}" alt="${esc(item.titolo)}" loading="lazy">
+                    ${item.descrizione ? `<div class="card-info-pop" role="note">${descrizioneHtml(item.descrizione)}</div>` : ''}
                     <div class="card-content">
-                        <h3>${esc(item.titolo || 'Titolo non disponibile')}</h3>
+                        <div class="card-titolo-row">
+                            <h3>${esc(item.titolo || 'Titolo non disponibile')}</h3>
+                            ${item.descrizione ? `<button class="card-info" type="button" aria-label="Info sul progetto" title="Info sul progetto">i</button>` : ''}
+                        </div>
                         <div class="card-autrice">${esc(item.autrice || '')}</div>
                         ${chipsHtml ? `<div class="card-chips"><span class="card-chips-label">Materiali</span>${chipsHtml}</div>` : ''}
                     </div>
@@ -515,6 +530,21 @@ document.addEventListener('DOMContentLoaded', () => {
         const mostraAdattaTaglia = !filatiRiferimento.some(f =>
             f.tags && f.tags.some(tag => tagDaEscludere.includes(tag.toLowerCase()))
         );
+
+        // Set o kit da acquistare (MTT campo setKit {tipo, nome, link, immagine}, dal 30/09/2026)
+        const sk = tutorial.setKit;
+        const setCard = sk && sk.link && sk.tipo === 'set'
+            ? `<div class="modale-filato-card mfc-set">
+                   <div class="mfc-img-wrap">${sk.immagine
+                       ? `<img src="${safeUrl(sk.immagine)}" alt="${esc(sk.nome)}" class="mfc-img" loading="lazy" onerror="this.style.display='none'">`
+                       : `<div class="mfc-img mfc-img--vuota">👜</div>`}</div>
+                   <div class="mfc-info">
+                       <span class="mfc-nome">${esc(sk.nome || 'Set Tessiland')}</span>
+                       <span class="mfc-comp">Set per il montaggio</span>
+                       <a class="mfc-link" href="${safeUrl(sk.link)}" target="_blank" rel="noopener">Vedi prodotto ↗</a>
+                   </div>
+               </div>`
+            : '';
 
         // Sezione filati/materiali nella modale — label dinamico
         let sezioneFilatiHtml = '';
@@ -551,8 +581,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
             sezioneFilatiHtml = `
                 <div class="modale-info-row">
-                    <span class="modale-label">Filati Tessiland</span>
-                    <div class="modale-filati-cards">${cardsHtml}</div>
+                    <span class="modale-label">${setCard ? 'Filati e set Tessiland' : 'Filati Tessiland'}</span>
+                    <div class="modale-filati-cards">${cardsHtml}${setCard}</div>
+                </div>`;
+        } else if (setCard) {
+            sezioneFilatiHtml = `
+                <div class="modale-info-row">
+                    <span class="modale-label">Set Tessiland</span>
+                    <div class="modale-filati-cards">${setCard}</div>
                 </div>`;
         } else if (tutorial.materiali) {
             const chips = tutorial.materiali.split(',')
@@ -563,6 +599,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="modale-filati-chips">${chips}</div>
                 </div>`;
         }
+
+        // KIT → pulsante viola (un solo acquisto con tutto il necessario); il SET sta come card accanto ai filati
+        const setKitHtml = sk && sk.link && sk.tipo === 'kit'
+            ? `<a class="btn-setkit" href="${safeUrl(sk.link)}" target="_blank" rel="noopener">
+                   <span class="btn-setkit-top">🛍️ ${sk.tipo === 'kit' ? 'Acquista il kit completo' : 'Acquista il set'}</span>
+                   <span class="btn-setkit-nome">${esc(sk.nome || '')}</span>
+               </a>`
+            : '';
 
         const btnAdatta = mostraAdattaTaglia
             ? `<button class="tool-tile" data-tool="adatta-taglia">
@@ -589,11 +633,13 @@ document.addEventListener('DOMContentLoaded', () => {
                             <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 000-7.78z"/></svg>
                         </button>
                     </div>
+                    ${tutorial.descrizione ? `<p class="modale-descrizione">${descrizioneHtml(tutorial.descrizione)}</p>` : ''}
                     <div class="modale-info-row">
                         <span class="modale-label">Autrice</span>
                         <span class="modale-value">${tutorial.autrice}</span>
                     </div>
                     ${sezioneFilatiHtml}
+                    ${setKitHtml}
                     <div class="modale-azioni-tool">
                         <button class="tool-tile" data-tool="sostituisci-filato">
                             <span class="tool-tile-icon">🔄</span>
