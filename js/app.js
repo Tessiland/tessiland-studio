@@ -502,7 +502,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 000-7.78z"/></svg>
                     </button>
                     <img src="${safeUrl(thumb)}" alt="${esc(item.titolo)}" loading="lazy">
-                    ${item.descrizione ? `<div class="card-info-pop" role="note">${descrizioneHtml(item.descrizione)}</div>` : ''}
+                    ${item.descrizione ? `<div class="card-info-pop" role="note">${descrizioneHtml(item.descrizione)}<span class="card-info-chiudi">Chiudi ✕</span></div>` : ''}
                     <div class="card-content">
                         <div class="card-titolo-row">
                             <h3>${esc(item.titolo || 'Titolo non disponibile')}</h3>
@@ -546,6 +546,32 @@ document.addEventListener('DOMContentLoaded', () => {
                </div>`
             : '';
 
+        // Materiali del progetto (card con foto, max 4 + «altri») e attrezzi generici (riga «Utili») — dal 30/09/2026
+        // fallback: il vecchio campo MTT prodottoEsterno {nome, link} diventa una card materiale
+        const materiali = (tutorial.materialiCollegati && tutorial.materialiCollegati.length)
+            ? tutorial.materialiCollegati
+            : (tutorial.prodottoEsterno?.nome && tutorial.prodottoEsterno?.link ? [tutorial.prodottoEsterno] : []);
+        const cardMateriale = (m, nascosta) => `
+            <div class="modale-filato-card mfc-set${nascosta ? ' mfc-extra' : ''}">
+                <div class="mfc-img-wrap">${m.immagine
+                    ? `<img src="${safeUrl(m.immagine)}" alt="${esc(m.nome)}" class="mfc-img" loading="lazy" onerror="this.style.display='none'">`
+                    : `<div class="mfc-img mfc-img--vuota">🧵</div>`}</div>
+                <div class="mfc-info">
+                    <span class="mfc-nome">${esc(m.nome)}</span>
+                    ${m.link ? `<a class="mfc-link" href="${safeUrl(m.link)}" target="_blank" rel="noopener">Vedi prodotto ↗</a>` : ''}
+                </div>
+            </div>`;
+        const MAX_MAT = 4;
+        const materialiHtml = materiali.map((m, i) => cardMateriale(m, i >= MAX_MAT)).join('')
+            + (materiali.length > MAX_MAT ? `<button type="button" class="mfc-altri">+${materiali.length - MAX_MAT} altri</button>` : '');
+        const attrezzi = tutorial.attrezzi || [];
+        const attrezziHtml = attrezzi.length
+            ? `<div class="modale-utili"><span class="modale-utili-label">Utili:</span> ${attrezzi.map(a => a.link
+                ? `<a href="${safeUrl(a.link)}" target="_blank" rel="noopener">${esc(a.nome)}</a>`
+                : esc(a.nome)).join(' · ')}</div>`
+            : '';
+        const extraHtml = setCard + materialiHtml;
+
         // Sezione filati/materiali nella modale — label dinamico
         let sezioneFilatiHtml = '';
         if (tutorial.filatiCollegati && tutorial.filatiCollegati.length > 0) {
@@ -581,14 +607,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
             sezioneFilatiHtml = `
                 <div class="modale-info-row">
-                    <span class="modale-label">${setCard ? 'Filati e set Tessiland' : 'Filati Tessiland'}</span>
-                    <div class="modale-filati-cards">${cardsHtml}${setCard}</div>
+                    <span class="modale-label">${materiali.length ? 'Filati e materiali Tessiland' : setCard ? 'Filati e set Tessiland' : 'Filati Tessiland'}</span>
+                    <div class="modale-filati-cards">${cardsHtml}${extraHtml}</div>
+                    ${attrezziHtml}
                 </div>`;
-        } else if (setCard) {
+        } else if (extraHtml) {
             sezioneFilatiHtml = `
                 <div class="modale-info-row">
-                    <span class="modale-label">Set Tessiland</span>
-                    <div class="modale-filati-cards">${setCard}</div>
+                    <span class="modale-label">${materiali.length ? 'Materiali Tessiland' : 'Set Tessiland'}</span>
+                    <div class="modale-filati-cards">${extraHtml}</div>
+                    ${attrezziHtml}
                 </div>`;
         } else if (tutorial.materiali) {
             const chips = tutorial.materiali.split(',')
@@ -597,6 +625,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="modale-info-row">
                     <span class="modale-label">Materiali</span>
                     <div class="modale-filati-chips">${chips}</div>
+                    ${attrezziHtml}
                 </div>`;
         }
 
@@ -673,6 +702,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const btn = e.currentTarget;
             const now = togglePreferito(btn.dataset.id);
             btn.classList.toggle('is-fav', now);
+        });
+
+        // «+N altri» materiali
+        modaleTutorialBody.querySelector('.mfc-altri')?.addEventListener('click', e => {
+            modaleTutorialBody.querySelectorAll('.mfc-extra').forEach(c => c.classList.remove('mfc-extra'));
+            e.currentTarget.remove();
         });
 
         // Zoom sulle miniature filato nella modale

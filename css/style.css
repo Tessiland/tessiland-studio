@@ -1773,3 +1773,44 @@ a.risultato-link:hover {
 .btn-setkit:hover { background: var(--primary-dark); }
 .btn-setkit-top { font-weight: 700; font-size: 0.95rem; }
 .btn-setkit-nome { font-size: 0.8rem; opacity: 0.9; }
+
+/* chiudi del fumetto ⓘ, materiali oltre i primi 4, riga «Utili» — 30/09/2026 */
+.card-info-chiudi {
+    display: block;
+    margin-top: 0.55rem;
+    padding-top: 0.45rem;
+    border-top: 1px solid var(--border);
+    text-align: right;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--primary);
+}
+.mfc-extra { display: none; }
+.mfc-altri {
+    align-self: center;
+    padding: 0.45rem 0.9rem;
+    border: 1.5px dashed var(--primary);
+    border-radius: 999px;
+    background: white;
+    color: var(--primary-dark);
+    font-weight: 700;
+    font-size: 0.82rem;
+    cursor: pointer;
+}
+.modale-utili {
+    margin-top: 0.45rem;
+    font-size: 0.82rem;
+    line-height: 1.5;
+    color: var(--text-muted);
+}
+.modale-utili-label { font-weight: 700; }
+.modale-utili a { color: var(--primary-dark); text-decoration: underline; text-underline-offset: 2px; }
+/* telefono: card filati/materiali una per riga (in due colonne diventavano alte e strette) — 30/09/2026 */
+@media (max-width: 560px) {
+    .modale-filati-cards { grid-template-columns: 1fr; gap: 0.45rem; }
+    .modale-filato-card .mfc-img-wrap { width: 60px; }
+    .modale-filato-card .mfc-info { flex-direction: row; flex-wrap: wrap; align-items: center; column-gap: 0.5rem; }
+    .modale-filato-card .mfc-nome { flex: 1 1 100%; }
+    .modale-filato-card .mfc-link { margin-top: 0; }
+    .mfc-altri { justify-self: start; }
+}
