@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const URL_CALCOLO = 'https://stimaconsumoavanzata-blvnz6q2ua-uc.a.run.app';
 
     const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-    // descrizione breve del progetto (MTT, dal 30/09/2026): righe separate da a-capo
+    // descrizione breve del progetto (MTT campo descrizioneProgetto, dal 30/09/2026 — il vecchio «descrizione» contiene nomi di filati): righe separate da a-capo
     const descrizioneHtml = d => String(d || '').split(/\n+/).map(r => esc(r.trim())).filter(Boolean).join('<br>');
     const safeUrl = u => { try { const url = new URL(u, location.href); return ['http:','https:'].includes(url.protocol) ? url.href : '#'; } catch { return '#'; } };
 
@@ -502,11 +502,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 000-7.78z"/></svg>
                     </button>
                     <img src="${safeUrl(thumb)}" alt="${esc(item.titolo)}" loading="lazy">
-                    ${item.descrizione ? `<div class="card-info-pop" role="note">${descrizioneHtml(item.descrizione)}<span class="card-info-chiudi">Chiudi ✕</span></div>` : ''}
+                    ${item.descrizioneProgetto ? `<div class="card-info-pop" role="note">${descrizioneHtml(item.descrizioneProgetto)}<span class="card-info-chiudi">Chiudi ✕</span></div>` : ''}
                     <div class="card-content">
                         <div class="card-titolo-row">
                             <h3>${esc(item.titolo || 'Titolo non disponibile')}</h3>
-                            ${item.descrizione ? `<button class="card-info" type="button" aria-label="Info sul progetto" title="Info sul progetto">i</button>` : ''}
+                            ${item.descrizioneProgetto ? `<button class="card-info" type="button" aria-label="Info sul progetto" title="Info sul progetto">i</button>` : ''}
                         </div>
                         <div class="card-autrice">${esc(item.autrice || '')}</div>
                         ${chipsHtml ? `<div class="card-chips"><span class="card-chips-label">Materiali</span>${chipsHtml}</div>` : ''}
@@ -662,7 +662,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 000-7.78z"/></svg>
                         </button>
                     </div>
-                    ${tutorial.descrizione ? `<p class="modale-descrizione">${descrizioneHtml(tutorial.descrizione)}</p>` : ''}
+                    ${tutorial.descrizioneProgetto ? `<p class="modale-descrizione">${descrizioneHtml(tutorial.descrizioneProgetto)}</p>` : ''}
                     <div class="modale-info-row">
                         <span class="modale-label">Autrice</span>
                         <span class="modale-value">${tutorial.autrice}</span>
