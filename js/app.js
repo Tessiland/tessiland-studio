@@ -323,9 +323,12 @@ document.addEventListener('DOMContentLoaded', () => {
             return r.json();
         }),
         fetch(URL_FILATI).then(r => r.json()),
-        fetch(URL_FATTORI).then(r => r.json())
+        fetch(URL_FATTORI).then(r => r.json()),
+        // sostituti consigliati da Tessiland per i filati esauriti: { idEsaurito: [idSostituto, ...] } (30/09/2026)
+        fetch(`data/sostituti.json?v=${Date.now()}`).then(r => r.ok ? r.json() : {}).catch(() => ({}))
     ])
-    .then(([tutorials, filati, fattori]) => {
+    .then(([tutorials, filati, fattori, sostituti]) => {
+        stato.dati.sostituti      = sostituti || {};
         stato.dati.tuttiTutorials = tutorials;
         stato.dati.tuttiFilati    = filati;
         stato.dati.tuttiFilatiMap = new Map(filati.map(f => [f.id, f]));
@@ -445,6 +448,15 @@ document.addEventListener('DOMContentLoaded', () => {
         renderAppCatalogo();
     });
 
+    // testo in più su cui cercare (30/09/2026): descrizione, materiali del progetto, set/kit — gli attrezzi no (sono ovunque)
+    function testoRicercaExtra(t) {
+        if (t._ricercaExtra === undefined) {
+            t._ricercaExtra = [t.descrizioneProgetto, t.setKit?.nome, ...(t.materialiCollegati || []).map(m => m.nome)]
+                .filter(Boolean).join(' ').toLowerCase();
+        }
+        return t._ricercaExtra;
+    }
+
     function renderAppCatalogo() {
         let lista = stato.dati.tuttiTutorials;
         const { termineRicerca, autrice, filatoId } = stato.filtriCatalogo;
@@ -453,7 +465,8 @@ document.addEventListener('DOMContentLoaded', () => {
             lista = lista.filter(t =>
                 (t.titolo    || '').toLowerCase().includes(termineRicerca) ||
                 (t.autrice   || '').toLowerCase().includes(termineRicerca) ||
-                (t.materiali || '').toLowerCase().includes(termineRicerca)
+                (t.materiali || '').toLowerCase().includes(termineRicerca) ||
+                testoRicercaExtra(t).includes(termineRicerca)
             );
         }
         if (autrice !== 'tutte') {
@@ -587,7 +600,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 const zoomBtn  = immagine
                     ? `<button class="mfc-zoom" data-src="${immagine}" data-nome="${fc.nome}" type="button" title="Ingrandisci">⊕</button>`
                     : '';
-                const linkHtml = link && link !== '#'
+                // filato esaurito: niente link morto, etichetta + nostro sostituto consigliato + tool «Sostituisci»
+                const esaurito = f && f.stato && f.stato !== 'Attivo';
+                const consigliati = esaurito
+                    ? (stato.dati.sostituti[fc.id] || []).map(id => stato.dati.tuttiFilatiMap.get(id))
+                        .filter(x => x && x.stato === 'Attivo' && x.link && x.link !== '#')
+                    : [];
+                const linkHtml = esaurito
+                    ? `<span class="mfc-esaurito">Non più disponibile</span>
+                       ${consigliati.length ? `<span class="mfc-consigliato">Al suo posto ti consigliamo: ${consigliati.map(x =>
+                           `<a href="${safeUrl(x.link)}" target="_blank" rel="noopener">${esc(x.nome)} ↗</a>`).join(' o ')}</span>` : ''}
+`
+                    : link && link !== '#'
                     ? `<a class="mfc-link" href="${link}" target="_blank" rel="noopener">Vedi prodotto ↗</a>`
                     : '';
 
@@ -637,6 +661,10 @@ document.addEventListener('DOMContentLoaded', () => {
                </a>`
             : '';
 
+        // filati del tutorial non più in vendita → il tile «Sostituisci» diventa «Consigli per sostituire il filato» e parte da loro
+        const esauriti = filatiRiferimento.filter(f => f.stato && f.stato !== 'Attivo');
+        const haEsauriti = esauriti.length > 0;
+
         const btnAdatta = mostraAdattaTaglia
             ? `<button class="tool-tile" data-tool="adatta-taglia">
                 <span class="tool-tile-icon">📐</span>
@@ -670,9 +698,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     ${sezioneFilatiHtml}
                     ${setKitHtml}
                     <div class="modale-azioni-tool">
-                        <button class="tool-tile" data-tool="sostituisci-filato">
+                        <button class="tool-tile${haEsauriti ? ' tool-tile--evidenza' : ''}" data-tool="sostituisci-filato">
                             <span class="tool-tile-icon">🔄</span>
-                            <span class="tool-tile-label">Sostituisci<br>il Filato</span>
+                            <span class="tool-tile-label">${haEsauriti ? 'Consigli per<br>sostituire il filato' : 'Sostituisci<br>il Filato'}</span>
                         </button>
                         ${btnAdatta}
                     </div>
@@ -692,7 +720,7 @@ document.addEventListener('DOMContentLoaded', () => {
         modaleTutorialBody.querySelectorAll('.tool-btn, .tool-tile').forEach(btn => {
             btn.addEventListener('click', e => {
                 const t = e.currentTarget;
-                if (t.dataset.tool === 'sostituisci-filato') mostraToolSostituzione(tutorial, filatiRiferimento);
+                if (t.dataset.tool === 'sostituisci-filato') mostraToolSostituzione(tutorial, haEsauriti ? esauriti : filatiRiferimento);
                 if (t.dataset.tool === 'adatta-taglia')     mostraToolAdattamento(tutorial, filatiRiferimento);
             });
         });

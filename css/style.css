@@ -1814,3 +1814,32 @@ a.risultato-link:hover {
     .modale-filato-card .mfc-link { margin-top: 0; }
     .mfc-altri { justify-self: start; }
 }
+
+/* filato esaurito nella modale: etichetta, sostituto consigliato, tool Sostituisci — 30/09/2026 */
+.mfc-esaurito {
+    align-self: flex-start;
+    padding: 0.15rem 0.5rem;
+    border-radius: 999px;
+    background: #F3E7E7;
+    color: #8A3B3B;
+    font-size: 0.72rem;
+    font-weight: 700;
+}
+.mfc-consigliato { font-size: 0.78rem; line-height: 1.4; color: var(--text); }
+.mfc-consigliato a { color: var(--primary-dark); font-weight: 700; }
+.mfc-sostituto {
+    align-self: flex-start;
+    margin-top: 0.15rem;
+    padding: 0.35rem 0.7rem;
+    border: none;
+    border-radius: 999px;
+    background: var(--primary);
+    color: white;
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+.mfc-sostituto:hover { background: var(--primary-dark); }
+
+.tool-tile--evidenza { background: var(--primary) !important; color: white !important; }
+.tool-tile--evidenza .tool-tile-label { color: white !important; }
