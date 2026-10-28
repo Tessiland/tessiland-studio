@@ -1,0 +1,9 @@
+# Studio web → app Tessiland (28/10/2026). Il primo che corrisponde vince: i più specifici in alto.
+# Per tornare indietro: git revert di questo commit (o ripartire dal tag studio-web-ultimo) e push.
+/  tutorial=:id  https://app.tessiland.com/s/t/:id  301!
+/  tool=consumo  https://app.tessiland.com/s/tessiland-studio?tool=consumo  301!
+/  tool=prezzo   https://app.tessiland.com/s/tessiland-studio?tool=prezzo  301!
+/  filato=:f     https://app.tessiland.com/s/tessiland-studio?filato=:f  301!
+# il service worker resta raggiungibile: è già quello che si disinstalla da solo
+/sw.js  /sw.js  200
+/*  https://app.tessiland.com/s/tessiland-studio  301!
