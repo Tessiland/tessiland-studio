@@ -6,4 +6,6 @@
 /  filato=:f     https://app.tessiland.com/s/tessiland-studio?filato=:f  301!
 # il service worker resta raggiungibile: è già quello che si disinstalla da solo
 /sw.js  /sw.js  200
+# data/sostituti.json lo legge l'app (spec §… «Filato esaurito»): resta raggiungibile finché non si sposta nel bucket
+/data/*  /data/:splat  200
 /*  https://app.tessiland.com/s/tessiland-studio  301!
